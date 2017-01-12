@@ -1,0 +1,145 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Portfolio",
+    "description": "Portfolio"
+  },
+  "host": "localhost:4000",
+  "basePath": "/api/portfolio/",
+  "tags": [
+    {
+      "name": "general",
+      "description": "Get the version of the portfolio"
+    },
+    {
+      "name": "portfolio",
+      "description": "Add/Remove/Update Portfolio Position"
+    }
+  ],
+  "paths": {
+    "/version": {
+      "get": {
+        "tags": [
+          "general"
+        ],
+        "summary": "get version",
+        "description": "get the version",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "return version",
+            "schema": {
+              "type": "object",
+              "required": [
+                "version"
+              ],
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "example": "1.0.0"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stock": {
+      "post": {
+        "tags": [
+          "portfolio"
+        ],
+        "summary": "Add new positon to stock",
+        "description": "This will add stock to the portfolio",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "symbol",
+                "shares",
+                "price"
+              ],
+              "properties": {
+                "symbol": {
+                  "type": "string",
+                  "example": "SPY"
+                },
+                "shares": {
+                  "type": "int",
+                  "example": 100
+                },
+                "price": {
+                  "type": "float",
+                  "example": 12.25
+                }
+              }
+            },
+            "required": true,
+            "description": "json object with symbol,size,price."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/stock/{symbol}": {
+      "delete": {
+        "tags": [
+          "portfolio"
+        ],
+        "summary": "Delete position.",
+        "description": "Delete the position for your portfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "the name of symbol remove",
+            "x-example": "SPY"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "portfolio"
+        ],
+        "summary": "Get portfolio",
+        "description": "Return summay of you positions",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    }
+  }
+}
