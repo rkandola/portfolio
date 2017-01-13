@@ -17,7 +17,51 @@
 <body ng-controller="mainController">
 	<div class="container">
 		<div class="jumbotron text-center">
-			<h1>Portfolio {{version}}</h1>
+			<h1>Portfolio</h1>
 		</div>
+		<div class="row">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Symbol</th>
+						<th>Name</th>
+						<th>PL</th>
+						<th>Return</th>
+						<th>Last Price</th>
+						<th>Date</th>
+						<th>Shares</th>
+						<th>Original Price</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tr ng-repeat="position in portfolio">
+					<td>{{ position.symbol }}</td>
+					<td>{{ position.name }}</td>
+					<td>${{ (position.pl).toFixed(2) }}</td>
+					<td>{{ (position.ret*100).toFixed(2) }}%</td>
+					<td>{{ position.lastPrice }}</td>
+					<td>{{ position.lastDate | date :  "dd/MM/y" }}</td>
+					<td>{{ position.shares }}</td>
+					<td>{{ position.price }}</td>
+					<td><button type="button" class="btn btn-danger" ng-click="deletePosition(position.symbol)">Delete</button></td>
+				</tr>
+			</table>
+		</div>
+		<div id="add-form" class="row">
+            <div class="col-sm-8 col-sm-offset-2 text-center">
+                <form>
+                    <div class="form-group">
+
+                        <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+                        <input type="text" class="form-control input-lg text-center" placeholder="symbol" ng-model="formData.symbol">
+                        <input type="text" class="form-control input-lg text-center" placeholder="shares" ng-model="formData.shares">
+                        <input type="text" class="form-control input-lg text-center" placeholder="price" ng-model="formData.price">
+                    </div>
+
+                    <!-- createToDo() WILL CREATE NEW TODOS -->
+                    <button type="submit" class="btn btn-primary btn-lg" ng-click="addPosition()">Add</button>
+                </form>
+            </div>
+        </div>
 </body>
 </html>

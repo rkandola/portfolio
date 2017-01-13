@@ -4,6 +4,7 @@
 
 (function() {
     var router = require('express').Router(),
+    	portfolio = require('./portfolio'),
         routeTable;
 
     module.exports.router = router;
@@ -16,11 +17,64 @@
                 accessType: "read",
                 userAccess: true
             }
+        },
+    	'/stock': {
+	        'post': {
+	            handler: add_position,
+	            resourceType: "service",
+	            accessType: "read",
+	            userAccess: true
+	        }
+    	},
+        '/stock/:symbol': {
+            'delete': {
+                handler: delete_position,
+                resourceType: "service",
+                accessType: "read",
+                userAccess: true
+            }
+        },
+        '/': {
+            'get': {
+                handler: get_position,
+                resourceType: "service",
+                accessType: "read",
+                userAccess: true
+            }
         }
     };
     function get_version(req, res)
     {
-    	res.json("1.0.1");
+    	res.json("1.0.0");
+    }
+    function add_position(req, res)
+    {
+    	if ( portfolio.addPosition(req.body) ) {
+    		res.status(201).json("Position Added");
+    	} 
+    	else {
+    		res.status(400).json("Bad Request");
+    	}
+    	
+    }
+    function delete_position(req, res)
+    {
+    	if ( portfolio.deletePosition(req.params.symbol) ) {
+    		res.status(201).json("Position Deleted");
+    	}
+    	else {
+    		res.status(400).json("Bad Request");
+    	}
+    	
+    }
+    function get_position(req, res)
+    {
+    	portfolio.getPortfolio()
+    	.then(function(allPrices){	
+    		console.log("in all then");
+    		res.json(portfolio.formatPortfolio(allPrices));
+    	});
+    	
     }
     function registerRoutePath(routeEntry) {
         Object.keys(routeTable[routeEntry]).map(function(method) {
