@@ -49,30 +49,39 @@
     }
     function add_position(req, res)
     {
-    	if ( portfolio.addPosition(req.body) ) {
+    	portfolio.addPosition(1,req.body)
+    	.then(function(p){
     		res.status(201).json("Position Added");
-    	} 
-    	else {
+    	})
+    	.catch(function(err){
+    		console.log("Error could not add position"+err);
     		res.status(400).json("Bad Request");
-    	}
-    	
+    	});
     }
     function delete_position(req, res)
     {
-    	if ( portfolio.deletePosition(req.params.symbol) ) {
+    	portfolio.deletePosition(1,req.params.symbol)
+    	.then(function(p){
     		res.status(201).json("Position Deleted");
-    	}
-    	else {
+    	})
+    	.catch(function(err){
+    		console.log("Error could not delete position"+err);
     		res.status(400).json("Bad Request");
-    	}
-    	
+    	});   	
     }
     function get_position(req, res)
     {
-    	portfolio.getPortfolio()
-    	.then(function(allPrices){	
-    		console.log("in all then");
-    		res.json(portfolio.formatPortfolio(allPrices));
+    	var p = {};
+    	portfolio.getPosition(1,p)
+    	.then(function(p){
+    		portfolio.getPrices(p)
+    		.then(function(allPrices){
+        		res.json(portfolio.formatPortfolio(p,allPrices));
+    		});
+    	})
+    	.catch(function(err){
+    		console.log("Error could not get positions"+err);
+    		res.status(400).json("Bad Request");
     	});
     	
     }

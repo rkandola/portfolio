@@ -2,45 +2,66 @@
 /* jslint node: true */
 /* globals require, __dirname, module */
 
-global.portfolio = {};
 (function () {
-	var publicFunction = {}, price = require('./price');
+	var publicFunction = {}
+		,mysql = require('mysql')
+		,dbconfig = require('../config/database')
+		,connection_config = {}
+		,price = require('./price');
 	
-	publicFunction.addPosition = function (currentPosition) {
-		
-		if (currentPosition.symbol in global.portfolio ) {
-			return false;
-		}
-		var position =  {};
-		position.symbol = currentPosition.symbol;
-		position.shares = currentPosition.shares;
-		position.price = currentPosition.price;
-		console.log()
-		global.portfolio[position.symbol] = position;
-		return true;
+	connection_config.database = dbconfig.database;
+	connection_config.host = dbconfig.connection.host;
+	connection_config.user = dbconfig.connection.user;
+	connection_config.password = dbconfig.connection.password;
+	
+	publicFunction.addPosition = function (user_id,currentPosition) {
+		return new Promise(function(resolve,reject){		
+			var queryString = "INSERT INTO position set ? ";
+			var data = {};
+			data.user_id =user_id;
+			data.symbol =currentPosition.symbol;
+			data.shares =currentPosition.shares;
+			data.price =currentPosition.price;
+			var connection = mysql.createConnection(connection_config);
+			connection.connect();
+			connection.query(queryString,data, function(err, rows, fields) {
+				if (err) reject(err);
+			    resolve("OK");
+			});
+			connection.end();
+		});
 	};
-	publicFunction.deletePosition = function (stock) {
+	publicFunction.deletePosition = function (user_id,symbol) {
 		
-		if (stock in global.portfolio ) {
-			delete global.portfolio[stock];	
-			return true;
-		}
-		return false;
+		return new Promise(function(resolve,reject){		
+			var queryString = "DELETE FROM position where user_id= "
+				+user_id+ " AND "
+				+"symbol = '"+symbol+"'";
+			var connection = mysql.createConnection(connection_config);
+			connection.connect();
+			connection.query(queryString, function(err, rows, fields) {
+				if (err) reject(err);
+			    resolve("OK");
+			});
+			connection.end();
+		});
 	};
-	publicFunction.getPortfolio = function () {
+	publicFunction.getPrices = function (positions) {
 		var getAllPrices = [];
-		for ( var symbol in global.portfolio){
+		console.log("In getPrice"+JSON.stringify(positions));
+		for ( var symbol in positions){
 			getAllPrices.push(price.getPrice(symbol));
 		}
 		return Promise.all(getAllPrices);
 	};
-	publicFunction.formatPortfolio = function (prices) {
+	publicFunction.formatPortfolio = function (positons,prices) {
 		console.log("formatPortfolio"+ JSON.stringify(prices));
+		console.log("formatPortfolio"+ JSON.stringify(positons));
 		
 		var portfolio = [];
 		for (var i=0; i< prices.length; i++){
 			var price = prices[i];
-			var orginalPortfolio = global.portfolio[price.symbol]
+			var orginalPortfolio = positons[price.symbol]
 			var updatePortfolio = {};
 			updatePortfolio.symbol = orginalPortfolio.symbol;
 			updatePortfolio.shares = orginalPortfolio.shares;
@@ -55,5 +76,26 @@ global.portfolio = {};
 		console.log("Done formatPortfolio");
 		return portfolio;
 	};
+	publicFunction.getPosition = function (user_id,p)
+	{
+		return new Promise(function(resolve,reject){
+			
+			var queryString = 'SELECT * FROM position where user_id='+user_id;
+			var connection = mysql.createConnection(connection_config);
+			connection.connect();
+			connection.query(queryString, function(err, rows, fields) {
+				if (err) reject(err);
+			    for (var i in rows) {
+			    	var position =  {};
+					position.symbol = rows[i].symbol;
+					position.shares = rows[i].shares;
+					position.price = rows[i].price;
+					p[position.symbol] = position;
+			    }
+			    resolve(p);
+			});
+			connection.end();
+		});
+	}
 	module.exports = publicFunction;
 }());
