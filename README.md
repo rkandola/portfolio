@@ -1,4 +1,4 @@
-# portfolio
+# Portfolio
 Basic node application with RestAPI to manage portfolio.
 
 ## To install
@@ -24,8 +24,8 @@ sudo chown $(whoami) /usr/local/bin
 ### Install Global npm packages 
 
 ```
-npm install grunt-cli
-npm install jshint
-npm install nodemon
-npm install istanbul
+npm install -g grunt-cli
+npm install -g jshint
+npm install -g nodemon
+npm install -g istanbul
 ```
